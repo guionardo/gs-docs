@@ -36,7 +36,7 @@ List of user (comma separated) from within will be get all repositories.
 * Configuration: `users`
 
 
-### Configuration file
+### Configuration file (gs_docs.yaml)
 
 ```yaml
 organizations: 
