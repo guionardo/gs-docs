@@ -16,6 +16,9 @@ class TestConfiguration(unittest.TestCase):
         f = loader(list[str], None, 'test')
         v = f()
         self.assertEqual(['1234', '4567'], v)
+        f = loader(str, None, 'test')
+        v = f()
+        self.assertEqual('1234,4567', v)
 
     def test_loader_from_file(self):
         with TemporaryDirectory() as tmpdir:

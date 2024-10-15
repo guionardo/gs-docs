@@ -5,6 +5,7 @@ import yaml
 
 GS_DOCS_ENV_PREFIX = 'GSDOCS_'
 GS_DOCS_FILE = os.getenv('GSDOCS_CONFIG_FILE', 'gs_docs.yaml')
+GS_DOC_PROJECT_FILE = '.gsdocs.yaml'
 
 
 def loader(
@@ -15,7 +16,7 @@ def loader(
     Env will use UPPERCASE with GSDOCS_ prefix
     """
 
-    if (origin := getattr(data_type, '__origin__')) and origin is list:
+    if (origin := getattr(data_type, '__origin__', None)) and origin is list:
         is_iterable = True
         data_type = data_type.__args__[0]
     else:
@@ -44,9 +45,7 @@ def loader(
 
 @dataclass
 class Configuration:
-    users: list[str] = field(
-        default_factory=loader(str, GS_DOCS_FILE, 'users', [], True)
-    )
+    users: list[str] = field(default_factory=loader(list[str], GS_DOCS_FILE, 'users'))
     organizations: list[str] = field(
         default_factory=loader(list[str], GS_DOCS_FILE, 'organizations')
     )
@@ -54,15 +53,13 @@ class Configuration:
 
 @dataclass
 class ProjectConfig:
-    doc_folder: str
-    enabled: bool
-    project_title: str
-    project_description: str
-
-
-#     doc_folder: "docs"  #
-
-
-# enabled: true
-# project_title: "Name of the project"
-# project_description: "Description of the project"
+    doc_folder: str = field(
+        default_factory=loader(str, GS_DOC_PROJECT_FILE, 'doc_folder', 'docs')
+    )
+    enabled: bool = field(
+        default_factory=loader(bool, GS_DOC_PROJECT_FILE, 'enabled', True)
+    )
+    title: str = field(default_factory=loader(str, GS_DOC_PROJECT_FILE, 'title'))
+    description: str = field(
+        default_factory=loader(str, GS_DOC_PROJECT_FILE, 'description')
+    )
