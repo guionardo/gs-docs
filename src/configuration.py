@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field
-
+from dataclasses_json import dataclass_json
 import yaml
 
 GS_DOCS_ENV_PREFIX = 'GSDOCS_'
@@ -13,7 +13,6 @@ def loader(
 ) -> callable:
     """Tries to load data from file or environment variable
     Field name will use lowercase
-    Env will use UPPERCASE with GSDOCS_ prefix
     """
 
     if (origin := getattr(data_type, '__origin__', None)) and origin is list:
@@ -23,14 +22,12 @@ def loader(
         is_iterable = False
 
     def func():
-        env_name = f'{GS_DOCS_ENV_PREFIX}{field_name}'.upper()
-        if not (value := os.getenv(env_name)):
-            try:
-                with open(file_name or '') as f:
-                    data = yaml.load(f, Loader=yaml.SafeLoader)
-                    value = data[field_name.lower()]
-            except Exception:
-                value = default
+        try:
+            with open(file_name or '') as f:
+                data = yaml.load(f, Loader=yaml.SafeLoader)
+                value = data[field_name.lower()]
+        except Exception:
+            value = default
 
         if is_iterable:
             if not isinstance(value, list):
@@ -43,6 +40,7 @@ def loader(
     return func
 
 
+@dataclass_json
 @dataclass
 class Configuration:
     users: list[str] = field(default_factory=loader(list[str], GS_DOCS_FILE, 'users'))
@@ -51,6 +49,14 @@ class Configuration:
     )
 
 
+@dataclass_json
+@dataclass
+class Repository:
+    name: str
+    enabled: bool = field(default=True)
+
+
+@dataclass_json
 @dataclass
 class ProjectConfig:
     doc_folder: str = field(

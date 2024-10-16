@@ -11,15 +11,6 @@ class TestConfiguration(unittest.TestCase):
     def setUp(self):
         os.environ.update({f'{GS_DOCS_ENV_PREFIX}TEST': ''})
 
-    def test_loader_from_env(self):
-        os.environ[f'{GS_DOCS_ENV_PREFIX}TEST'] = '1234,4567'
-        f = loader(list[str], None, 'test')
-        v = f()
-        self.assertEqual(['1234', '4567'], v)
-        f = loader(str, None, 'test')
-        v = f()
-        self.assertEqual('1234,4567', v)
-
     def test_loader_from_file(self):
         with TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, 'config.yaml')
